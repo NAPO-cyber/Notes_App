@@ -2,6 +2,8 @@ package com.notes.app.controller;
 
 import com.notes.app.model.Note;
 import com.notes.app.service.NotesService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,8 +20,11 @@ public class NotesController {
 
     // create
     @PostMapping
-    public Note createNote(@RequestBody Note note) {
-        return notesService.createNote(note);
+    public ResponseEntity<Note> createNote(@RequestBody Note note) {
+        Note createdNote = notesService.createNote(note);
+
+    // an XSS warning by IDE, will be rmved by validation / security later...
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdNote);
     }
 
     // read
@@ -30,8 +35,11 @@ public class NotesController {
 
     // read one note
     @GetMapping("/{id}")
-    public Note getNoteById(@PathVariable Long id) {
-        return notesService.getNoteById(id);
+    public ResponseEntity<Note> getNoteById(@PathVariable Long id) {
+
+        Note note = notesService.getNoteById(id);
+
+        return ResponseEntity.ok(note);
     }
 
     // delete all
@@ -42,8 +50,10 @@ public class NotesController {
 
     // delete by id
     @DeleteMapping("{id}")
-    public void deleteById(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         notesService.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 
