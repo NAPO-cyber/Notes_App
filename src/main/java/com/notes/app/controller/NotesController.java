@@ -1,7 +1,9 @@
 package com.notes.app.controller;
 
+import com.notes.app.dto.NoteRequest;
 import com.notes.app.model.Note;
 import com.notes.app.service.NotesService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +22,13 @@ public class NotesController {
 
     // create
     @PostMapping
-    public ResponseEntity<Note> createNote(@RequestBody Note note) {
-        Note createdNote = notesService.createNote(note);
+    public ResponseEntity<Note> createNote(@Valid @RequestBody NoteRequest request) {
+        Note createdNote = notesService.createNote(request);
 
     // an XSS warning by IDE, will be rmved by validation / security later...
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdNote);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdNote);
     }
 
     // read

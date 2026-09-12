@@ -1,5 +1,6 @@
 package com.notes.app.service;
 
+import com.notes.app.dto.NoteRequest;
 import com.notes.app.exception.NoteNotFoundException;
 import com.notes.app.model.Note;
 import com.notes.app.repository.NotesRepo;
@@ -16,7 +17,12 @@ public class NotesService {
         this.notesRepo = notesRepo;
     }
 
-    public Note createNote(Note note) {
+    public Note createNote(NoteRequest request) {
+        Note note = new Note();
+
+        note.setTitle(request.getTitle());
+        note.setContent(request.getContent());
+
         return notesRepo.save(note);
     }
 

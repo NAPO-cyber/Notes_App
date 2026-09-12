@@ -9,10 +9,14 @@ import java.util.List;
 @Repository
 public class NotesRepo {
 
+    private Long nextId = 1L;
+
     private final List<Note> notes = new ArrayList<>();
 
     public Note save (Note note) {
+        note.setId(nextId++);
         notes.add(note);
+
         return note;
     }
 

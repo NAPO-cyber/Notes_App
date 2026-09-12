@@ -12,6 +12,9 @@ public class Note {
         this.title = title;
     }
 
+    public Note() {}
+
+
     public Long getId() {
         return id;
     }
