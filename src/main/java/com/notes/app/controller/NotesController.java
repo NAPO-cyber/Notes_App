@@ -60,6 +60,15 @@ public class NotesController {
         return ResponseEntity.noContent().build();
     }
 
+    // update note by id
+    @PutMapping("/{id}")
+    public ResponseEntity<Note> updateNote(
+            @PathVariable Long id,
+            @Valid @RequestBody NoteRequest request) {
 
+        Note updatedNote = notesService.updateNote(id, request);
+
+        return ResponseEntity.ok(updatedNote);
+    }
 
 }

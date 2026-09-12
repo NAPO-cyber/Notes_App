@@ -13,7 +13,7 @@ public class NotesRepo {
 
     private final List<Note> notes = new ArrayList<>();
 
-    public Note save (Note note) {
+    public Note save(Note note) {
         note.setId(nextId++);
         notes.add(note);
 
@@ -24,7 +24,7 @@ public class NotesRepo {
         return notes;
     }
 
-    public Note FindById(Long id) {
+    public Note findById(Long id) {
         return notes.stream()
                 .filter(note -> note.getId().equals(id))
                 .findFirst()
@@ -41,5 +41,15 @@ public class NotesRepo {
         System.out.println("Note Deleted.");
     }
 
+
+    public Note update(Note note) {
+        for (int i = 0; i < notes.size(); i++) {
+            if (notes.get(i).getId().equals(note.getId())) {
+                notes.set(i, note);
+                return note;
+            }
+        }
+        return null;
+    }
 
 }

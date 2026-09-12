@@ -37,7 +37,7 @@ public class NotesService {
     }
 
     public Note getNoteById(Long id) {
-        Note note = notesRepo.FindById(id);
+        Note note = notesRepo.findById(id);
 
         if (note == null) {
             throw new NoteNotFoundException("note not found with id: " + id);
@@ -53,4 +53,19 @@ public class NotesService {
         notesRepo.clearById(id);
     }
 
+    public Note updateNote(Long id, NoteRequest request) {
+
+        Note existingNote = notesRepo.findById(id);
+
+        if (existingNote == null) {
+            throw new NoteNotFoundException(
+                    "Note not found with id: " + id
+            );
+        }
+
+        existingNote.setTitle(request.getTitle());
+        existingNote.setContent(request.getContent());
+
+        return notesRepo.update(existingNote);
+    }
 }
