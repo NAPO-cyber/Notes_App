@@ -30,42 +30,33 @@ public class NotesService {
         List<Note> note = notesRepo.findAll();
 
         if (note.isEmpty()) {
-
             throw new NoteNotFoundException("there are no notes yet!");
         }
+
         return note;
     }
 
     public Note getNoteById(Long id) {
-        Note note = notesRepo.findById(id);
-
-        if (note == null) {
-            throw new NoteNotFoundException("note not found with id: " + id);
-        }
-        return note;
+        return notesRepo.findById(id)
+                .orElseThrow(() -> new NoteNotFoundException("Note not found with id: " + id));
     }
 
     public void deleteAll() {
-        notesRepo.clearAll();
+        notesRepo.deleteAll();
     }
 
     public void deleteById(Long id) {
-        notesRepo.clearById(id);
+        Note note = getNoteById(id);
+
+        notesRepo.delete(note);
     }
 
     public Note updateNote(Long id, NoteRequest request) {
+        Note note = getNoteById(id);
 
-        Note existingNote = notesRepo.findById(id);
+        note.setTitle(request.getTitle());
+        note.setContent(request.getContent());
 
-        if (existingNote == null) {
-            throw new NoteNotFoundException(
-                    "Note not found with id: " + id
-            );
-        }
-
-        existingNote.setTitle(request.getTitle());
-        existingNote.setContent(request.getContent());
-
-        return notesRepo.update(existingNote);
+        return notesRepo.save(note);
     }
 }

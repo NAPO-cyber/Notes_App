@@ -1,7 +1,13 @@
 package com.notes.app.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "notes")
 public class Note {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String content;
