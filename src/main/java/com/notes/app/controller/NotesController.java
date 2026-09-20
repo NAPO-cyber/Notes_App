@@ -27,7 +27,6 @@ public class NotesController {
     @PostMapping
     public ResponseEntity<NoteResponse> createNote(@Valid @RequestBody NoteRequest request) {
 
-    // an XSS warning by IDE, will be rmved by validation / security later...
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(notesService.createNote(request));
