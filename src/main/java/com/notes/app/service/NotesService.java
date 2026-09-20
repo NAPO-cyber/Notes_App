@@ -10,10 +10,14 @@ import com.notes.app.repository.NotesRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Service
 public class NotesService {
+
+    private static final Logger log = LoggerFactory.getLogger(NotesService.class);
 
     private final NoteMapper noteMapper;
     private final NotesRepo notesRepo;
@@ -24,6 +28,9 @@ public class NotesService {
     }
 
     public NoteResponse createNote(NoteRequest request) {
+
+        log.info("Creating new note");
+
         Note note = new Note();
 
         note.setTitle(request.getTitle());
@@ -31,7 +38,9 @@ public class NotesService {
 
         Note savedNote = notesRepo.save(note);
 
-        return noteMapper.toResponse(note);
+        log.info("Note created with id: {}", savedNote.getId());
+
+        return noteMapper.toResponse(savedNote);
     }
 
     public Page<NoteResponse> getAllNotes(Pageable pageable) {
@@ -46,6 +55,9 @@ public class NotesService {
     }
 
     public Note getNoteById(Long id) {
+
+        log.info("Fetching note with id: {}", id);
+
         return notesRepo.findById(id)
                 .orElseThrow(() -> new NoteNotFoundException("Note not found with id: " + id));
     }
@@ -58,6 +70,8 @@ public class NotesService {
         Note note = getNoteById(id);
 
         notesRepo.delete(note);
+
+        log.info("Deleting note with id: {}", id);
     }
 
     public NoteResponse updateNote(Long id, NoteRequest request) {
@@ -68,6 +82,8 @@ public class NotesService {
         note.setContent(request.getContent());
 
         Note updateeNote = notesRepo.save(note);
+
+        log.info("Updating note with id: {}", id);
 
         return new NoteResponse(
                 updateeNote.getId(),
