@@ -1,5 +1,6 @@
 package com.notes.app.service;
 
+import com.notes.app.dto.NotePatchRequest;
 import com.notes.app.dto.NoteRequest;
 import com.notes.app.dto.NoteResponse;
 import com.notes.app.exception.NoteNotFoundException;
@@ -75,5 +76,23 @@ public class NotesService {
                 updateeNote.getCreatedAt(),
                 updateeNote.getUpdatedAt()
         );
+    }
+
+    public NoteResponse patchNote(Long id, NotePatchRequest request) {
+
+        Note note = notesRepo.findById(id)
+                .orElseThrow(() -> new NoteNotFoundException("Note not found!"));
+
+        if (request.getTitle() != null) {
+            note.setTitle(request.getTitle());
+        }
+
+        if (request.getContent() != null) {
+            note.setContent((request.getContent()));
+        }
+
+        Note updatedNote = notesRepo.save(note);
+
+        return noteMapper.toResponse(updatedNote);
     }
 }

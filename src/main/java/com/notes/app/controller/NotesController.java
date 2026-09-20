@@ -1,5 +1,6 @@
 package com.notes.app.controller;
 
+import com.notes.app.dto.NotePatchRequest;
 import com.notes.app.dto.NoteRequest;
 import com.notes.app.dto.NoteResponse;
 import com.notes.app.model.Note;
@@ -68,6 +69,12 @@ public class NotesController {
             @Valid @RequestBody NoteRequest request) {
 
         return ResponseEntity.ok(notesService.updateNote(id, request));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<NoteResponse> patchNote(@PathVariable Long id, @RequestBody NotePatchRequest request) {
+
+        return ResponseEntity.ok(notesService.patchNote(id, request));
     }
 
 }
