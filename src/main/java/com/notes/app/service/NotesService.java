@@ -1,6 +1,7 @@
 package com.notes.app.service;
 
 import com.notes.app.dto.NoteRequest;
+import com.notes.app.dto.NoteResponse;
 import com.notes.app.exception.NoteNotFoundException;
 import com.notes.app.model.Note;
 import com.notes.app.repository.NotesRepo;
@@ -8,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class NotesService {
@@ -19,17 +19,32 @@ public class NotesService {
         this.notesRepo = notesRepo;
     }
 
-    public Note createNote(NoteRequest request) {
+    public NoteResponse createNote(NoteRequest request) {
         Note note = new Note();
 
         note.setTitle(request.getTitle());
         note.setContent(request.getContent());
 
-        return notesRepo.save(note);
+        Note savedNote = notesRepo.save(note);
+
+        return new NoteResponse(
+                savedNote.getId(),
+                savedNote.getTitle(),
+                savedNote.getContent(),
+                savedNote.getCreatedAt(),
+                savedNote.getUpdatedAt()
+        );
     }
 
-    public Page<Note> getAllNotes(Pageable pageable) {
-        Page<Note> note = notesRepo.findAll(pageable);
+    public Page<NoteResponse> getAllNotes(Pageable pageable) {
+        Page<NoteResponse> note = notesRepo.findAll(pageable)
+                .map(note1 -> new NoteResponse(
+                        note1.getId(),
+                        note1.getTitle(),
+                        note1.getContent(),
+                        note1.getCreatedAt(),
+                        note1.getUpdatedAt()
+                ));
 
         if (note.isEmpty()) {
             throw new NoteNotFoundException("there are no notes yet!");
@@ -53,12 +68,21 @@ public class NotesService {
         notesRepo.delete(note);
     }
 
-    public Note updateNote(Long id, NoteRequest request) {
-        Note note = getNoteById(id);
+    public NoteResponse updateNote(Long id, NoteRequest request) {
+        Note note = notesRepo.findById(id)
+                        .orElseThrow(() -> new NoteNotFoundException("Note not found!"));
 
         note.setTitle(request.getTitle());
         note.setContent(request.getContent());
 
-        return notesRepo.save(note);
+        Note updateeNote = notesRepo.save(note);
+
+        return new NoteResponse(
+                updateeNote.getId(),
+                updateeNote.getTitle(),
+                updateeNote.getContent(),
+                updateeNote.getCreatedAt(),
+                updateeNote.getUpdatedAt()
+        );
     }
 }

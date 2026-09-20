@@ -1,6 +1,7 @@
 package com.notes.app.controller;
 
 import com.notes.app.dto.NoteRequest;
+import com.notes.app.dto.NoteResponse;
 import com.notes.app.model.Note;
 import com.notes.app.service.NotesService;
 import jakarta.validation.Valid;
@@ -10,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -24,18 +24,17 @@ public class NotesController {
 
     // create
     @PostMapping
-    public ResponseEntity<Note> createNote(@Valid @RequestBody NoteRequest request) {
-        Note createdNote = notesService.createNote(request);
+    public ResponseEntity<NoteResponse> createNote(@Valid @RequestBody NoteRequest request) {
 
     // an XSS warning by IDE, will be rmved by validation / security later...
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(createdNote);
+                .body(notesService.createNote(request));
     }
 
     // read
     @GetMapping
-    public Page<Note> getAllNotes(Pageable pageable) {
+    public Page<NoteResponse> getAllNotes(Pageable pageable) {
         return notesService.getAllNotes(pageable);
     }
 
@@ -64,13 +63,11 @@ public class NotesController {
 
     // update note by id
     @PutMapping("/{id}")
-    public ResponseEntity<Note> updateNote(
+    public ResponseEntity<NoteResponse> updateNote(
             @PathVariable Long id,
             @Valid @RequestBody NoteRequest request) {
 
-        Note updatedNote = notesService.updateNote(id, request);
-
-        return ResponseEntity.ok(updatedNote);
+        return ResponseEntity.ok(notesService.updateNote(id, request));
     }
 
 }

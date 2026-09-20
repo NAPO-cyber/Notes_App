@@ -31,21 +31,20 @@ public class Note {
         updatedAt = LocalDateTime.now();
     }
 
-    public Note(Long id, String content, String title) {
+    public Note(Long id, String content, String title, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.content = content;
         this.title = title;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public Note() {}
+    public Note() {
+    }
 
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getContent() {
@@ -62,5 +61,13 @@ public class Note {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }
