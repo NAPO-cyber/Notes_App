@@ -20,6 +20,10 @@ public class Note {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -69,5 +73,13 @@ public class Note {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 }
