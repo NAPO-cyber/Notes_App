@@ -4,6 +4,8 @@ import com.notes.app.dto.NoteRequest;
 import com.notes.app.model.Note;
 import com.notes.app.service.NotesService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +35,8 @@ public class NotesController {
 
     // read
     @GetMapping
-    public List<Note> getNotes() {
-        return notesService.getAllNotes();
+    public Page<Note> getAllNotes(Pageable pageable) {
+        return notesService.getAllNotes(pageable);
     }
 
     // read one note

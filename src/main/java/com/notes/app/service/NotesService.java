@@ -4,6 +4,8 @@ import com.notes.app.dto.NoteRequest;
 import com.notes.app.exception.NoteNotFoundException;
 import com.notes.app.model.Note;
 import com.notes.app.repository.NotesRepo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +28,8 @@ public class NotesService {
         return notesRepo.save(note);
     }
 
-    public List<Note> getAllNotes() {
-        List<Note> note = notesRepo.findAll();
+    public Page<Note> getAllNotes(Pageable pageable) {
+        Page<Note> note = notesRepo.findAll(pageable);
 
         if (note.isEmpty()) {
             throw new NoteNotFoundException("there are no notes yet!");
