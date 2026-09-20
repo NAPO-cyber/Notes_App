@@ -6,9 +6,12 @@ import com.notes.app.dto.NoteResponse;
 import com.notes.app.exception.NoteNotFoundException;
 import com.notes.app.mapper.NoteMapper;
 import com.notes.app.model.Note;
+import com.notes.app.model.User;
 import com.notes.app.repository.NotesRepo;
+import com.notes.app.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,20 +24,24 @@ public class NotesService {
 
     private final NoteMapper noteMapper;
     private final NotesRepo notesRepo;
+    private final UserRepository userRepository;
 
-    public NotesService(NoteMapper noteMapper, NotesRepo notesRepo) {
+    public NotesService(NoteMapper noteMapper, NotesRepo notesRepo, UserRepository userRepository) {
         this.noteMapper = noteMapper;
         this.notesRepo = notesRepo;
+        this.userRepository = userRepository;
     }
 
     public NoteResponse createNote(NoteRequest request) {
 
         log.info("Creating new note");
 
+        User user = getCurrentUser();
         Note note = new Note();
 
         note.setTitle(request.getTitle());
         note.setContent(request.getContent());
+        note.setUser(user);
 
         Note savedNote = notesRepo.save(note);
 
@@ -44,7 +51,9 @@ public class NotesService {
     }
 
     public Page<NoteResponse> getAllNotes(Pageable pageable) {
-        Page<NoteResponse> note = notesRepo.findAll(pageable)
+        User user = getCurrentUser();
+
+        Page<NoteResponse> note = notesRepo.findByUser(user, pageable)
                 .map(noteMapper::toResponse);
 
         if (note.isEmpty()) {
@@ -58,12 +67,20 @@ public class NotesService {
 
         log.info("Fetching note with id: {}", id);
 
-        return notesRepo.findById(id)
-                .orElseThrow(() -> new NoteNotFoundException("Note not found with id: " + id));
+        User user = getCurrentUser();
+
+        return notesRepo.findByIdAndUser(id, user)
+                .orElseThrow(() ->
+                        new NoteNotFoundException("Note not found with id: " + id));
     }
 
     public void deleteAll() {
-        notesRepo.deleteAll();
+
+        User user = getCurrentUser();
+
+        long deletedCount = notesRepo.deleteByUser(user);
+
+        log.info("Deleted {} notes for user: {}", deletedCount, user.getUsername());
     }
 
     public void deleteById(Long id) {
@@ -75,40 +92,57 @@ public class NotesService {
     }
 
     public NoteResponse updateNote(Long id, NoteRequest request) {
-        Note note = notesRepo.findById(id)
-                        .orElseThrow(() -> new NoteNotFoundException("Note not found!"));
+
+        User user = getCurrentUser();
+
+        Note note = notesRepo.findByIdAndUser(id, user)
+                .orElseThrow(() ->
+                        new NoteNotFoundException("Note not found!"));
 
         note.setTitle(request.getTitle());
         note.setContent(request.getContent());
 
-        Note updateeNote = notesRepo.save(note);
+        Note updatedNote = notesRepo.save(note);
 
         log.info("Updating note with id: {}", id);
 
         return new NoteResponse(
-                updateeNote.getId(),
-                updateeNote.getTitle(),
-                updateeNote.getContent(),
-                updateeNote.getCreatedAt(),
-                updateeNote.getUpdatedAt()
+                updatedNote.getId(),
+                updatedNote.getTitle(),
+                updatedNote.getContent(),
+                updatedNote.getCreatedAt(),
+                updatedNote.getUpdatedAt()
         );
     }
 
     public NoteResponse patchNote(Long id, NotePatchRequest request) {
 
-        Note note = notesRepo.findById(id)
-                .orElseThrow(() -> new NoteNotFoundException("Note not found!"));
+        User user = getCurrentUser();
+
+        Note note = notesRepo.findByIdAndUser(id, user)
+                .orElseThrow(() ->
+                        new NoteNotFoundException("Note not found!"));
 
         if (request.getTitle() != null) {
             note.setTitle(request.getTitle());
         }
 
         if (request.getContent() != null) {
-            note.setContent((request.getContent()));
+            note.setContent(request.getContent());
         }
 
         Note updatedNote = notesRepo.save(note);
 
         return noteMapper.toResponse(updatedNote);
+    }
+
+    private User getCurrentUser() {
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
