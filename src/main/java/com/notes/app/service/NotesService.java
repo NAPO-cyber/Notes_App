@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -74,6 +75,7 @@ public class NotesService {
                         new NoteNotFoundException("Note not found with id: " + id));
     }
 
+    @Transactional
     public void deleteAll() {
 
         User user = getCurrentUser();
